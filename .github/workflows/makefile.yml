@@ -35,4 +35,4 @@ jobs:
         file: docker/alpine/Dockerfile
         context: .
         push: true
-        tags: user/app:latest
+        tags: wqd180067/http-echo:latest
