@@ -44,8 +44,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - uses: danielr1996/kubectl-action@1.0.0
-      name: Deploy
+    - name: Run Azure PowerShell script
+      uses: azure/powershell@v1
       with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
-        args: apply -f deployment.yaml
+        inlineScript: |
+          kubectl apply -f deployment.yaml
+        azPSVersion: "latest"
