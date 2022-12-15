@@ -92,7 +92,7 @@ metadata:
   name: name-virtual-host-ingress
 spec:
   rules:
-  - host: foo.localhost
+  - host: foo.http-echo.host.local
     http:
       paths:
       - pathType: Prefix
@@ -102,7 +102,7 @@ spec:
             name: foo
             port:
               number: 80
-  - host: bar.localhost
+  - host: bar.http-echo.host.local
     http:
       paths:
       - pathType: Prefix
