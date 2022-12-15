@@ -41,12 +41,11 @@ jobs:
   
     runs-on: self-hosted
     
-    steps: 
-    - uses: actions/checkout@v2
+    steps:
+    - uses: actions/checkout@v3
 
-    - name: Trigger deploy
-      uses: Consensys/kubernetes-action@master
-      env:
-        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+    - uses: danielr1996/kubectl-action@1.0.0
+      name: Deploy
       with:
-        args: apply -f ./deployment.yaml
+        kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
+        args: apply -f deployment.yaml
