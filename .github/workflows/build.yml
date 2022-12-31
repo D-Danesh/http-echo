@@ -6,9 +6,11 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  BUILD_VERSION: 0.1
+
 jobs:
   build-publish:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -29,10 +31,44 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         
-    - name: Build and push
+    - name: Build and push image to Docker Hub
       uses: docker/build-push-action@v3
       with:
         file: docker/alpine/Dockerfile
         context: .
         push: true
-        tags: wqd180067/http-echo:latest
+        tags: wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
+
+    - name: Update image in foo-deployment.yaml
+      uses: actions-hub/kubectl@1.14.3
+      # env:
+      #   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
+      with:
+        args: set -f kubernetes/http-echo/foo-deployment.yaml foo=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
+
+    - name: Update image in bar-deployment.yaml
+      uses: actions-hub/kubectl@1.14.3
+      # env:
+      #   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
+      with:
+        args: set -f kubernetes/http-echo/bar-deployment.yaml bar=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
+
+  # update-kubernetes-repo:
+  #   needs: build-publish
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #   - uses: actions/checkout@v3
+
+  #   - name: Pushes to another repository
+  #     uses: cpina/github-action-push-to-another-repository@main
+  #     env:
+  #       SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+  #       API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+  #     with:
+  #       source-directory: 'output'
+  #       destination-github-username: 'D-Danesh'
+  #       destination-repository-name: 'kubernetes-demo'
+  #       user-email: ${{ secrets.EMAIL }}
+  #       target-branch: main
+
