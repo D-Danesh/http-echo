@@ -37,38 +37,34 @@ jobs:
         file: docker/alpine/Dockerfile
         context: .
         push: true
-        tags: wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
+        tags: wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ github.run_number }}-${{ github.run_attempt }}
+
+  update-kubernetes-manifest:
+    needs: build-publish
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Start Minikube
+      id: minikube
+      uses: medyagh/setup-minikube@latest
 
     - name: Update image in foo-deployment.yaml
-      uses: actions-hub/kubectl@v1.24.0
-      # env:
-      #   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
-      with:
-        args: set -f kubernetes/http-echo/foo-deployment.yaml foo=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
+      run: kubectl set -f kubernetes/http-echo/foo-deployment.yaml foo=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ github.run_number }}-${{ github.run_attempt }}
 
     - name: Update image in bar-deployment.yaml
-      uses: actions-hub/kubectl@v1.24.0
-      # env:
-      #   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
+      run: kubectl set -f kubernetes/http-echo/bar-deployment.yaml bar=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
+
+    - name: Pushes to another repository
+      uses: cpina/github-action-push-to-another-repository@main
+      env:
+        SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        args: set -f kubernetes/http-echo/bar-deployment.yaml bar=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
-
-  # update-kubernetes-repo:
-  #   needs: build-publish
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #   - uses: actions/checkout@v3
-
-  #   - name: Pushes to another repository
-  #     uses: cpina/github-action-push-to-another-repository@main
-  #     env:
-  #       SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
-  #       API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-  #     with:
-  #       source-directory: 'output'
-  #       destination-github-username: 'D-Danesh'
-  #       destination-repository-name: 'kubernetes-demo'
-  #       user-email: ${{ secrets.EMAIL }}
-  #       target-branch: main
+        source-directory: 'kubernetes'
+        destination-github-username: 'D-Danesh'
+        destination-repository-name: 'kubernetes-demo'
+        user-email: d.danesh1993@gmail.com
+        target-branch: main
 
