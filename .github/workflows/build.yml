@@ -46,15 +46,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Start Minikube
-      id: minikube
-      uses: medyagh/setup-minikube@latest
+    - name: yq - portable yaml processor
+      uses: mikefarah/yq@v4.30.6
 
-    - name: Update image in foo-deployment.yaml
-      run: kubectl set image -f kubernetes/http-echo/foo-deployment.yaml foo=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ github.run_number }}-${{ github.run_attempt }}
-
-    - name: Update image in bar-deployment.yaml
-      run: kubectl set image -f kubernetes/http-echo/bar-deployment.yaml bar=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
+    - name: Update http-echo image version in kube manifest file
+      run: /
+        DOCKER_IMAGE_V=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ github.run_number }}-${{ github.run_attempt }}
+        IMAGE_V=$DOCKER_IMAGE_V yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_V)' kubernetes/http-echo/foo-deployment.yaml
+        IMAGE_V=$DOCKER_IMAGE_V yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_V)' kubernetes/http-echo/bar-deployment.yaml
 
     - name: Pushes to another repository
       uses: cpina/github-action-push-to-another-repository@main
