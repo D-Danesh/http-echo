@@ -40,14 +40,14 @@ jobs:
         tags: wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
 
     - name: Update image in foo-deployment.yaml
-      uses: actions-hub/kubectl@1.14.3
+      uses: actions-hub/kubectl@v1.24.0
       # env:
       #   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
       with:
         args: set -f kubernetes/http-echo/foo-deployment.yaml foo=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
 
     - name: Update image in bar-deployment.yaml
-      uses: actions-hub/kubectl@1.24
+      uses: actions-hub/kubectl@v1.24.0
       # env:
       #   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
       with:
