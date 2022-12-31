@@ -45,6 +45,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        repository: D-Danesh/kubernetes-demo
+        token: ${{ secrets.API_TOKEN_GITHUB }}
 
     - name: yq - portable yaml processor
       uses: mikefarah/yq@v4.30.6
@@ -52,8 +55,8 @@ jobs:
     - name: Update http-echo image version in kube manifest file
       run: |
         DOCKER_IMAGE_V=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ github.run_number }}-${{ github.run_attempt }}
-        IMAGE_V=$DOCKER_IMAGE_V yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_V)' kubernetes/http-echo/foo-deployment.yaml
-        IMAGE_V=$DOCKER_IMAGE_V yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_V)' kubernetes/http-echo/bar-deployment.yaml
+        IMAGE_V=$DOCKER_IMAGE_V yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_V)' http-echo/foo-deployment.yaml
+        IMAGE_V=$DOCKER_IMAGE_V yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_V)' http-echo/bar-deployment.yaml
 
     - name: Pushes to another repository
       uses: cpina/github-action-push-to-another-repository@main
@@ -61,10 +64,10 @@ jobs:
         SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source-directory: 'kubernetes'
+        source-directory: '.'
         destination-github-username: 'D-Danesh'
         destination-repository-name: 'kubernetes-demo'
         user-email: d.danesh1993@gmail.com
         target-branch: master
-        commit-message: http-echo image patched to ${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
+        commit-message: http-echo image patched to ${{ env.BUILD_VERSION }}.${{ github.run_number }}-${{ github.run_attempt }}
 
