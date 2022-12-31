@@ -65,6 +65,6 @@ jobs:
         destination-github-username: 'D-Danesh'
         destination-repository-name: 'kubernetes-demo'
         user-email: d.danesh1993@gmail.com
-        target-branch: main
+        target-branch: master
         commit-message: http-echo image patched to ${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
 
