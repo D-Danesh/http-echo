@@ -50,7 +50,7 @@ jobs:
       uses: mikefarah/yq@v4.30.6
 
     - name: Update http-echo image version in kube manifest file
-      run: /
+      run: |
         DOCKER_IMAGE_V=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ github.run_number }}-${{ github.run_attempt }}
         IMAGE_V=$DOCKER_IMAGE_V yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_V)' kubernetes/http-echo/foo-deployment.yaml
         IMAGE_V=$DOCKER_IMAGE_V yq -i '.spec.template.spec.containers[0].image = strenv(IMAGE_V)' kubernetes/http-echo/bar-deployment.yaml
