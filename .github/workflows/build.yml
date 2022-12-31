@@ -51,10 +51,10 @@ jobs:
       uses: medyagh/setup-minikube@latest
 
     - name: Update image in foo-deployment.yaml
-      run: kubectl set -f kubernetes/http-echo/foo-deployment.yaml foo=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ github.run_number }}-${{ github.run_attempt }}
+      run: kubectl set image -f kubernetes/http-echo/foo-deployment.yaml foo=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ github.run_number }}-${{ github.run_attempt }}
 
     - name: Update image in bar-deployment.yaml
-      run: kubectl set -f kubernetes/http-echo/bar-deployment.yaml bar=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
+      run: kubectl set image -f kubernetes/http-echo/bar-deployment.yaml bar=wqd180067/http-echo:${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
 
     - name: Pushes to another repository
       uses: cpina/github-action-push-to-another-repository@main
@@ -67,4 +67,5 @@ jobs:
         destination-repository-name: 'kubernetes-demo'
         user-email: d.danesh1993@gmail.com
         target-branch: main
+        commit-message: http-echo image patched to ${{ env.BUILD_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_RUN_ATTEMPT }}
 
